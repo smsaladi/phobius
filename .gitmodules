@@ -1,0 +1,3 @@
+[submodule "decodeanhmm"]
+	path = decodeanhmm
+	url = git@github.com:smsaladi/decodeanhmm.git
