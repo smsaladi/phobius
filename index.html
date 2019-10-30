@@ -7,15 +7,10 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
     <title>Emscripten-Generated Code</title>
     <style>
-        .emscripten {
-            padding-right: 0;
-            margin-left: auto;
-            margin-right: auto;
-            display: block;
-        }
-
-        div.emscripten {
-            text-align: center;
+        body {
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto Mono', monospace;
         }
 
         #console {
@@ -32,23 +27,12 @@
             color: #fff;
         }
 
+        .error-text {
+            color: #e74c3c
+        }
+
         #console::-webkit-scrollbar {
             width: 0 !important
-        }
-
-        .button-container {
-            position: absolute;
-            right: 24px;
-            top: 50%;
-            -webkit-transform: translate(0%, -50%);
-            transform: translate(0%, -50%);
-            display: inline-block;
-        }
-
-        body {
-            margin: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto Mono', monospace;
         }
 
         .input-container {
@@ -60,6 +44,15 @@
             right: 0;
             padding: 12px 16px;
             box-sizing: border-box;
+        }
+
+        .button-container {
+            position: absolute;
+            right: 24px;
+            top: 50%;
+            -webkit-transform: translate(0%, -50%);
+            transform: translate(0%, -50%);
+            display: inline-block;
         }
 
         .button {
@@ -91,52 +84,6 @@
         .button.orange:active {
             background-color: #d35400;
         }
-
-        .error-text {
-            color: #e74c3c
-        }
-
-        .lds-ring {
-            display: block;
-            position: relative;
-            width: 64px;
-            height: 64px;
-            margin: 0 auto;
-        }
-
-        .lds-ring div {
-            box-sizing: border-box;
-            display: block;
-            position: absolute;
-            width: 51px;
-            height: 51px;
-            margin: 6px;
-            border: 6px solid #fff;
-            border-radius: 50%;
-            animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-            border-color: #fff transparent transparent transparent;
-        }
-
-        .lds-ring div:nth-child(1) {
-            animation-delay: -0.45s;
-        }
-
-        .lds-ring div:nth-child(2) {
-            animation-delay: -0.3s;
-        }
-
-        .lds-ring div:nth-child(3) {
-            animation-delay: -0.15s;
-        }
-
-        @keyframes lds-ring {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
     </style>
 </head>
 
@@ -146,29 +93,14 @@
         <br>
     </div>
 
-    <figure style="overflow:visible;" id="spinner">
-        <div class="lds-ring">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-        <center style="margin-top:0.5em"><strong>emscripten</strong></center>
-    </figure>
-    <div class="emscripten" id="status">Downloading...</div>
-
-    <div class="emscripten">
-        <progress value="0" max="100" id="progress" hidden=1></progress>
-    </div>
-
     <div class="input-container">
         <div style="display: inline-block; line-height: 25px">
             Options:&nbsp;
-            <input type="file" onchange="loadFile(1, this)">
+            <input type="file">
             <br> Model:&nbsp;&nbsp;&nbsp;
-            <input type="file" onchange="loadFile(2, this)">
+            <input type="file">
             <br> Sequence:
-            <input type="file" onchange="loadFile(3, this)">
+            <input type="file">
         </div>
         <div class="button-container">
             <div class="button orange" onclick="clearConsole()">Clear Console</div>
@@ -176,141 +108,9 @@
         </div>
     </div>
 
-    <script type='text/javascript'>
-        const statusElement = document.getElementById('status');
-        const progressElement = document.getElementById('progress');
-        const spinnerElement = document.getElementById('spinner');
-        var Module = {
-            arguments: ["-f", null, null, null],
-            preRun: [],
-            postRun: [],
-            noInitialRun: true,
-            print: function(text) {
-                if (arguments.length > 1) {
-                    text = Array.prototype.slice.call(arguments).join(' ');
-                }
-                text = text.replace(/&/g, "&amp;");
-                text = text.replace(/</g, "&lt;");
-                text = text.replace(/>/g, "&gt;");
-                text = text.replace('\n', '<br>', 'g');
-                console.log(text);
-                logConsole(text, false);
-            },
-            printErr: function(text) {
-                if (arguments.length > 1) {
-                    text = Array.prototype.slice.call(arguments).join(' ');
-                }
-                console.error(text);
-                logConsole(text, true);
-            },
-            setStatus: function(text) {
-                if (!Module.setStatus.last) Module.setStatus.last = {
-                    time: Date.now(),
-                    text: ''
-                };
-                if (text === Module.setStatus.last.text) return;
-                var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
-                var now = Date.now();
-                if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
-                Module.setStatus.last.time = now;
-                Module.setStatus.last.text = text;
-                if (m) {
-                    text = m[1];
-                    progressElement.value = parseInt(m[2]) * 100;
-                    progressElement.max = parseInt(m[4]) * 100;
-                    progressElement.hidden = false;
-                    spinnerElement.hidden = false;
-                } else {
-                    progressElement.value = null;
-                    progressElement.max = null;
-                    progressElement.hidden = true;
-                    if (!text) spinnerElement.hidden = true;
-                }
-                statusElement.innerHTML = text;
-            },
-            totalDependencies: 0,
-            monitorRunDependencies: function(left) {
-                this.totalDependencies = Math.max(this.totalDependencies, left);
-                Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-            }
-        };
-        Module.setStatus('Downloading...');
-        window.onerror = function() {
-            Module.setStatus('Exception thrown, see JavaScript console');
-            spinnerElement.style.display = 'none';
-            Module.setStatus = function(text) {
-                if (text) Module.printErr('[post-exception status] ' + text);
-            };
-        };
+    <script src="index.js"></script>
 
-        var mountedFiles = {};
-
-        function loadFile(arg, element) {
-            // If there is no file selected, then don't try and load it
-            if(element.files.length == 0) {
-                return;
-            }
-
-            let file = element.files[0];
-            let filename = file.name;
-            let reader = new FileReader();
-
-            // If we have already mounted this file, just set the filename as
-            // the appropriate argument and don't remount the file
-            if (mountedFiles[filename]) {
-                Module.arguments[arg] = filename;
-                return;
-            }
-
-            reader.addEventListener("load", function() {
-                // Crop out the initial padding in the data url
-                base64_data = reader.result.substring(reader.result.indexOf(",") + 1);
-
-                try {
-                    // Mount the file and set it as the appropriate argument
-                    mountedFiles[filename] = Module['FS_createDataFile'](".", filename, atob(base64_data), true, true);
-                    Module.arguments[arg] = filename;
-                    console.log("Loaded file " + filename + " successfully")
-                    logConsole("Loaded file " + filename + " successfully", false)
-                } catch (e) {
-                    logConsole("Could not load file " + filename, true);
-                    console.log(e);
-                }
-            }, false);
-
-            reader.readAsDataURL(file);
-        }
-
-        function clearConsole() {
-            var output = document.getElementById('console');
-            if (output) {
-                output.innerHTML = "";
-            }
-        }
-
-        function logConsole(text, isError) {
-            var output = document.getElementById('console');
-            if (!output) {
-                return;
-            }
-            if (isError) {
-                output.innerHTML = output.innerHTML + "<span class=error-text>" + text + "</span><br>";
-            } else {
-                output.innerHTML = output.innerHTML + text + "<br>";
-            }
-        }
-
-        function runPhobius() {
-            if (Module.arguments[1] == null || Module.arguments[2] == null || Module.arguments[3] == null) {
-                logConsole("You must provide a model, options, and sequence file!", true);
-                return;
-            }
-            clearConsole();
-            callMain(Module.arguments);
-        }
-    </script>
-
-    <script async src=project.js></script>
+    <script async src="project.js"></script>
 </body>
 
 </html>
