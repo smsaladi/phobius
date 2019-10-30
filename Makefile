@@ -10,7 +10,8 @@ all:
 	ln -s decodeanhmm/decodeanhmm decodeanhmm.bc
 
 	$(CC) decodeanhmm.bc -o project.js \
-		-s FORCE_FILESYSTEM=1 --preload-file preload
+		-s FORCE_FILESYSTEM=1 --preload-file preload \
+		-s MODULARIZE=1 -s 'EXPORT_NAME="Phobius"'
 
 clean:
 	rm -r preload *.bc project.js project.data project.wasm
