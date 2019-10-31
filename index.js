@@ -1,29 +1,42 @@
 // The html element we output console messages to
 const output = document.getElementById('console');
 // holds the current instance of the Phobius module.  Used to load files
-var Instance;
+var Module;
 
 function clearConsole() {
     output.innerHTML = "";
 }
 
 function logConsole(message, is_error) {
-    // Format message to print correctly in HTML
-    message = message.replace(/&/g, "&amp;");
-    message = message.replace(/</g, "&lt;");
-    message = message.replace(/>/g, "&gt;");
-    message = message.replace('\n', '<br>', 'g');
-
+    // Output to JS console
     if (is_error) {
         console.error(message);
-        output.innerHTML = output.innerHTML + "<span class=error-text>" + message + "</span><br>";
     } else {
         console.log(message);
-        output.innerHTML = output.innerHTML + message + "<br>";
     }
+
+    // Output to console html element
+    output.innerHTML = output.innerHTML + formatText(message, is_error);
 
     // Scroll to the end of the console
     output.scrollTop = output.scrollHeight;
+}
+
+//
+//  Formats text to print correctly in HTML
+//
+function formatText(text, is_error) {
+    text = text.replace(/&/g, "&amp;");
+    text = text.replace(/</g, "&lt;");
+    text = text.replace(/>/g, "&gt;");
+    text = text.replace('\n', '<br>', 'g');
+    text = text.replace(/ /g, '&nbsp;');
+
+    if(is_error) {
+        return "<span class=error-text>" + text + "</span><br>"
+    } else {
+        return text + "<br>";
+    }
 }
 
 //
