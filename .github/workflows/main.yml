@@ -1,0 +1,31 @@
+name: Build wasm and push to gh-pages
+
+on:
+  push:
+    branches:
+      - webasm
+
+jobs:
+  build-and-deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Clone emscipten
+        run: git clone https://github.com/emscripten-core/emsdk.git
+      - name: Set up emscripten
+        run: |
+          cd emsdk
+          ./emsdk install latest-fastcomp
+          ./emsdk activate latest-fastcomp
+      - name: Run makefile
+        run: |
+          sudo apt-get install csh
+          source ./emsdk/emsdk_env.sh
+          make
+      - name: Deploy to github pages
+        uses: maxheld83/ghpages@v0.2.1
+        env:
+          BUILD_DIR: public/
+          GH_PAT: ${{ secrets.GH_PAT }}
