@@ -140,21 +140,21 @@
             Options:&nbsp;
             <label id="options-selector" for="options" class="button small">Select File</label>
             <span id="options-label">(default)</span>
-            <input id="options" style="display:none;" type="file" onchange="updateFileLabel(this)">
+            <input id="options" style="display:none;" type="file" onchange="updateFileLabel(this, 'default')">
         </div>
 
         <div class="file">
             Model:&nbsp;&nbsp;&nbsp;
             <label id="model-selector" for="model" class="button small">Select File</label>
             <span id="model-label">(default)</span>
-            <input id="model" style="display:none;" type="file" onchange="updateFileLabel(this)">
+            <input id="model" style="display:none;" type="file" onchange="updateFileLabel(this, 'default')">
         </div>
 
         <div class="file">
             Sequence:
             <label id="sequence-selector" for="sequence" class="button small">Select File</label>
             <span id="sequence-label">(use text field)</span>
-            <input id="sequence" style="display:none;" type="file" onchange="updateFileLabel(this)">
+            <input id="sequence" style="display:none;" type="file" onchange="updateFileLabel(this, 'use text field')">
         </div>
 
         <textarea id="sequence-input"></textarea>

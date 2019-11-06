@@ -59,7 +59,7 @@ function download(filename, data) {
     }
 }
 
-function updateFileLabel(element) {
+function updateFileLabel(element, default_text) {
     const file = element.files[0]
     const label = document.getElementById(element.id + "-label");
     const selector = document.getElementById(element.id + "-selector");
@@ -69,7 +69,7 @@ function updateFileLabel(element) {
         label.innerHTML = "(" + file.name + ")"
     } else {
         selector.classList.remove("green");
-        label.innerHTML = "(default)"
+        label.innerHTML = "(" + default_text + ")"
     }
 }
 
