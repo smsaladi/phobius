@@ -9,8 +9,28 @@
     <style>
         body {
             margin: 0;
+            height: 100vh;
             box-sizing: border-box;
             font-family: 'Roboto Mono', monospace;
+        }
+
+        .console-container {
+            width: 60%;
+            display: inline-block;
+            position: relative;
+            height: 100vh;
+        }
+
+        .input-container {
+            background-color: #ecf0f1;
+            float: right;
+            width: 40%;
+            display: inline-flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            position: relative;
+            height: 100vh;
+            padding: 16px;
         }
 
         #console {
@@ -20,7 +40,8 @@
             bottom: 100px;
             left: 0;
             right: 0;
-            overflow: scroll;
+            overflow-wrap: break-word;
+            overflow-y: scroll;
             font-size: 10px;
             font-family: 'Roboto Mono', monospace;
             background-color: #2c3e50;
@@ -35,7 +56,7 @@
             width: 0 !important
         }
 
-        .input-container {
+        .controls-container {
             background-color: #bdc3c7;
             position: absolute;
             bottom: 0;
@@ -48,7 +69,7 @@
 
         .button-container {
             position: absolute;
-            right: 24px;
+            left: 24px;
             top: 50%;
             -webkit-transform: translate(0%, -50%);
             transform: translate(0%, -50%);
@@ -56,7 +77,7 @@
         }
 
         .button {
-            background-color: #27ae60;
+            background-color: #bdc3c7;
             color: #fff;
             border-radius: 5px;
             padding: 10px 20px;
@@ -65,11 +86,28 @@
             transition: background-color 0.25s;
         }
 
+        .button.small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
         .button:hover {
-            background-color: #2cc36b;
+            background-color: #cbd0d3;
         }
 
         .button:active {
+            background-color: #afb6bb;
+        }
+
+        .button.green {
+            background-color: #27ae60;
+        }
+
+        .button.green:hover {
+            background-color: #2cc36b;
+        }
+
+        .button.green:active {
             background-color: #229955;
         }
 
@@ -96,33 +134,78 @@
         .button.blue:active {
             background-color: #2980b9;
         }
+
+        #sequence-input {
+            flex-grow: 1;
+            background-color: rgba(255,255,255,0.5);
+            resize: none;
+            font-family: 'Roboto Mono', monospace;
+            margin-bottom: 10px;
+        }
+
+        .file {
+            font-size: 15px;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        #args {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 15px;
+            flex-grow: 1;
+        }
+
     </style>
 </head>
 
 <body>
-    <div id=console>
-        Please select an options, model, and input file below then press run.
-        <br>
+    <div class="console-container">
+        <div id=console>
+            Please select an options, model, and input file below then press run.
+            <br>
+        </div>
+
+        <div class="controls-container">
+            <div class="button-container">
+                <div class="button green" onclick="runPhobius()">Run</div>
+                <div class="button orange" onclick="clearConsole()">Clear Console</div>
+                <div class="button blue" onclick="downloadConsole()">Download Console</div>
+            </div>
+        </div>
     </div>
 
     <div class="input-container">
-        <div style="display: inline-block; line-height: 25px">
-            Options:&nbsp;
-            <input type="file">
-            <br> Model:&nbsp;&nbsp;&nbsp;
-            <input type="file">
-            <br> Sequence:
-            <input type="file">
+        <div class="file">
+            Options:&nbsp;&nbsp;&nbsp;
+            <label id="options-selector" for="options" class="button small">Select File</label>
+            <span id="options-label">&nbsp;(default)</span>
+            <input id="options" style="display:none;" type="file" onchange="updateFileLabel(this)">
         </div>
-        <div class="button-container">
-            <div class="button blue" onclick="downloadConsole()">Download Console</div>
-            <div class="button orange" onclick="clearConsole()">Clear Console</div>
-            <div class="button" onclick="runPhobius()">Run</div>
+
+        <div class="file">
+            Model:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <label id="model-selector" for="model" class="button small">Select File</label>
+            <span id="model-label">&nbsp;(default)</span>
+            <input id="model" style="display:none;" type="file" onchange="updateFileLabel(this)">
+        </div>
+
+        <div class="file">
+            Sequence:&nbsp;&nbsp;
+            <label id="sequence-selector" for="sequence" class="button small">Select File</label>
+            <span id="sequence-label">&nbsp;(use text field)</span>
+            <input id="sequence" style="display:none;" type="file" onchange="updateFileLabel(this)">
+        </div>
+
+        <textarea id="sequence-input"></textarea>
+
+        <div class="file">
+            Arguments:&nbsp;
+            <input id="args" type="text">
         </div>
     </div>
 
     <script src="index.js"></script>
-
     <script async src="project.js"></script>
 </body>
 
