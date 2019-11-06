@@ -66,10 +66,10 @@ function updateFileLabel(element) {
 
     if(file) {
         selector.classList.add("green");
-        label.innerHTML = "&nbsp;(" + file.name + ")"
+        label.innerHTML = "(" + file.name + ")"
     } else {
         selector.classList.remove("green");
-        label.innerHTML = "&nbsp;(default)"
+        label.innerHTML = "(default)"
     }
 }
 

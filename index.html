@@ -8,154 +8,116 @@
     <title>Phobius</title>
     <style>
         body {
-            margin: 0;
-            height: 100vh;
-            box-sizing: border-box;
             font-family: 'Roboto Mono', monospace;
+            margin: 0;
         }
 
         .console-container {
-            width: 60%;
-            display: inline-block;
-            position: relative;
-            height: 100vh;
-        }
-
-        .input-container {
-            background-color: #ecf0f1;
-            float: right;
-            width: 40%;
             display: inline-flex;
             flex-direction: column;
-            box-sizing: border-box;
-            position: relative;
             height: 100vh;
-            padding: 16px;
+            width: 60%;
         }
 
         #console {
-            position: absolute;
-            padding: 12px;
-            top: 0;
-            bottom: 100px;
-            left: 0;
-            right: 0;
-            overflow-wrap: break-word;
-            overflow-y: scroll;
-            font-size: 10px;
-            font-family: 'Roboto Mono', monospace;
             background-color: #2c3e50;
             color: #fff;
-        }
-
-        .error-text {
-            color: #e74c3c
+            flex-grow: 1;
+            font-size: 10px;
+            overflow-wrap: break-word;
+            overflow-y: scroll;
+            padding: 12px;
         }
 
         #console::-webkit-scrollbar {
             width: 0 !important
         }
 
-        .controls-container {
-            background-color: #bdc3c7;
-            position: absolute;
-            bottom: 0;
-            height: 100px;
-            left: 0;
-            right: 0;
-            padding: 12px 16px;
-            box-sizing: border-box;
+        .error-text {
+            color: #e74c3c
         }
 
         .button-container {
-            position: absolute;
-            left: 24px;
-            top: 50%;
-            -webkit-transform: translate(0%, -50%);
-            transform: translate(0%, -50%);
-            display: inline-block;
+            align-items: center;
+            background-color: #bdc3c7;
+            box-sizing: border-box;
+            display: flex;
+            flex-shrink: 0;
+            height: 80px;
+            padding-left: 24px;
+        }
+
+        .button-container > .button {
+            margin: 0 4px
         }
 
         .button {
             background-color: #bdc3c7;
+            border-radius: 4px;
             color: #fff;
-            border-radius: 5px;
-            padding: 10px 20px;
             display: inline-block;
             cursor: pointer;
-            transition: background-color 0.25s;
+            padding: 10px 20px;
+            transition: filter 0.2s;
         }
 
         .button.small {
-            padding: 5px 10px;
             font-size: 12px;
+            padding: 4px 10px;
         }
 
         .button:hover {
-            background-color: #cbd0d3;
+            filter: brightness(110%);
         }
 
         .button:active {
-            background-color: #afb6bb;
+            filter: brightness(90%);
         }
 
         .button.green {
             background-color: #27ae60;
         }
 
-        .button.green:hover {
-            background-color: #2cc36b;
-        }
-
-        .button.green:active {
-            background-color: #229955;
-        }
-
         .button.orange {
             background-color: #e67e22;
-        }
-
-        .button.orange:hover {
-            background-color: #e98b39;
-        }
-
-        .button.orange:active {
-            background-color: #d35400;
         }
 
         .button.blue {
             background-color: #3498db;
         }
 
-        .button.blue:hover {
-            background-color: #4aa3df;
+        .input-container {
+            background-color: #ecf0f1;
+            box-sizing: border-box;
+            display: inline-flex;
+            flex-direction: column;
+            float: right;
+            height: 100vh;
+            padding: 8px 16px;
+            position: relative;
+            width: 40%;
         }
 
-        .button.blue:active {
-            background-color: #2980b9;
+        .file {
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        #sequence-input, #args {
+            border: none;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            margin: 8px 0;
+            padding: 6px;
+            width: 100%;
         }
 
         #sequence-input {
             flex-grow: 1;
-            background-color: rgba(255,255,255,0.5);
             resize: none;
-            font-family: 'Roboto Mono', monospace;
-            margin-bottom: 10px;
         }
-
-        .file {
-            font-size: 15px;
-            margin-bottom: 10px;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        #args {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 15px;
-            flex-grow: 1;
-        }
-
     </style>
 </head>
 
@@ -166,41 +128,39 @@
             <br>
         </div>
 
-        <div class="controls-container">
-            <div class="button-container">
-                <div class="button green" onclick="runPhobius()">Run</div>
-                <div class="button orange" onclick="clearConsole()">Clear Console</div>
-                <div class="button blue" onclick="downloadConsole()">Download Console</div>
-            </div>
+        <div class="button-container">
+            <div class="button green" onclick="runPhobius()">Run</div>
+            <div class="button orange" onclick="clearConsole()">Clear Console</div>
+            <div class="button blue" onclick="downloadConsole()">Download Console</div>
         </div>
     </div>
 
     <div class="input-container">
         <div class="file">
-            Options:&nbsp;&nbsp;&nbsp;
+            Options:&nbsp;
             <label id="options-selector" for="options" class="button small">Select File</label>
-            <span id="options-label">&nbsp;(default)</span>
+            <span id="options-label">(default)</span>
             <input id="options" style="display:none;" type="file" onchange="updateFileLabel(this)">
         </div>
 
         <div class="file">
-            Model:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Model:&nbsp;&nbsp;&nbsp;
             <label id="model-selector" for="model" class="button small">Select File</label>
-            <span id="model-label">&nbsp;(default)</span>
+            <span id="model-label">(default)</span>
             <input id="model" style="display:none;" type="file" onchange="updateFileLabel(this)">
         </div>
 
         <div class="file">
-            Sequence:&nbsp;&nbsp;
+            Sequence:
             <label id="sequence-selector" for="sequence" class="button small">Select File</label>
-            <span id="sequence-label">&nbsp;(use text field)</span>
+            <span id="sequence-label">(use text field)</span>
             <input id="sequence" style="display:none;" type="file" onchange="updateFileLabel(this)">
         </div>
 
         <textarea id="sequence-input"></textarea>
 
         <div class="file">
-            Arguments:&nbsp;
+            Arguments:
             <input id="args" type="text">
         </div>
     </div>
