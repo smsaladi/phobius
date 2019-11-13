@@ -26,6 +26,9 @@ var InstantiateModule = (function(Module, args, files) {
         postRun: [function() {
             console.log("Finished running")
             console.log(Instance)
+            postMessage({
+                type: "complete"
+            });
         }],
         print: function(text) {
             if (arguments.length > 1) {
