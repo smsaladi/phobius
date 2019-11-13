@@ -1,7 +1,7 @@
 // The html element we output console messages to
 const output = document.getElementById('console');
-// holds the current instance of the Phobius module.  Used to load files
-var Module;
+const graphics = document.querySelector(".graphics");
+const graphics_container = document.querySelector(".graphics-container");
 const default_args = ["preload/phobius.options", "preload/phobius.model", null]
 
 function clearConsole() {
@@ -115,65 +115,29 @@ async function getFiles() {
     return files;
 }
 
-//
-//  Initialize the module parameters given the input files
-//
-function initModuleParams(files, extra_args) {
-    // Build the program arguments
-    let args = ["-f"];
-    let i = 0;
-    for(const file of files) {
-        // Fail if we are missing a file
-        if(!file && !default_args[i]) {
-            return false;
-        }
-
-        args.push(file ? file.name : default_args[i]);
-        i++;
-    }
-
-    return {
-        arguments: args.concat(extra_args),
-        preRun: [function() {
-            // Mount the files to the Module
-            let mounted_files = {};
-            for(const file of files) {
-                // Don't load the same file twice
-                if(!file || mounted_files[file.name]) {
-                    continue;
-                }
-
-                try {
-                    mounted_files[file.name] =
-                        Module["FS_createDataFile"](".", file.name, atob(file.data), true, true);
-                    logConsole("Loaded file " + file.name + " successfully", false)
-                } catch (e) {
-                    logConsole("Could not load file " + file.name, true);
-                    console.error(e);
-                }
-            }
-            clearConsole();
-        }],
-        postRun: [],
-        print: function(text) {
-            if (arguments.length > 1) {
-                text = Array.prototype.slice.call(arguments).join(' ');
-            }
-            logConsole(text, false);
-        },
-        printErr: function(text) {
-            if (arguments.length > 1) {
-                text = Array.prototype.slice.call(arguments).join(' ');
-            }
-            logConsole(text, true);
-        }
-    }
-}
-
 function getExtraArgs() {
     const raw = document.getElementById("args").value;
     const formatted = raw.replace(/\s\s+/g, ' ').trim();
     return formatted.length > 0 ? formatted.split(" ") : [];
+}
+
+function showGraphics() {
+    document.querySelector(".show-graphics").classList.remove("hidden");
+    graphics_container.classList.remove("hidden");
+
+    graphics.classList.remove("fadeOutUp");
+    graphics.classList.add("fadeInDown");
+    graphics_container.classList.remove("fadeOut");
+    graphics_container.classList.add("fadeIn");
+}
+
+function hideGraphics() {
+    graphics.classList.add("fadeOutUp");
+    graphics.classList.remove("fadeInDown");
+    graphics_container.classList.add("fadeOut");
+    graphics_container.classList.remove("fadeIn");
+
+    setTimeout(()=>graphics_container.classList.add("hidden"), 250);
 }
 
 //
@@ -197,5 +161,7 @@ async function runPhobius() {
     clearConsole();
     logConsole("./decode " + args.join(" "), false);
 
-    ModuleWrapper.instantiate(Phobius, args, files, (text) => logConsole(text, false), (text) => logConsole(text, true));
+    await ModuleWrapper.instantiate(Phobius, args, files, (text) => logConsole(text, false), (text) => logConsole(text, true));
+
+    showGraphics();
 }

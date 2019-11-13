@@ -5,121 +5,8 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link href="index.css" rel="stylesheet">
     <title>Phobius</title>
-    <style>
-        body {
-            font-family: 'Roboto Mono', monospace;
-            margin: 0;
-        }
-
-        .console-container {
-            display: inline-flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 60%;
-        }
-
-        #console {
-            background-color: #2c3e50;
-            color: #fff;
-            flex-grow: 1;
-            font-size: 10px;
-            overflow-wrap: break-word;
-            overflow-y: scroll;
-            padding: 12px;
-            font-size: 13px;
-        }
-
-        #console::-webkit-scrollbar {
-            width: 0 !important
-        }
-
-        .error-text {
-            color: #e74c3c
-        }
-
-        .button-container {
-            align-items: center;
-            background-color: #bdc3c7;
-            box-sizing: border-box;
-            display: flex;
-            flex-shrink: 0;
-            height: 80px;
-            padding-left: 24px;
-        }
-
-        .button-container > .button {
-            margin: 0 4px
-        }
-
-        .button {
-            background-color: #bdc3c7;
-            border-radius: 4px;
-            color: #fff;
-            display: inline-block;
-            cursor: pointer;
-            padding: 10px 20px;
-            transition: filter 0.2s;
-        }
-
-        .button.small {
-            font-size: 12px;
-            padding: 4px 10px;
-        }
-
-        .button:hover {
-            filter: brightness(110%);
-        }
-
-        .button:active {
-            filter: brightness(90%);
-        }
-
-        .button.green {
-            background-color: #27ae60;
-        }
-
-        .button.orange {
-            background-color: #e67e22;
-        }
-
-        .button.blue {
-            background-color: #3498db;
-        }
-
-        .input-container {
-            background-color: #ecf0f1;
-            box-sizing: border-box;
-            display: inline-flex;
-            flex-direction: column;
-            float: right;
-            height: 100vh;
-            padding: 8px 16px;
-            position: relative;
-            width: 40%;
-        }
-
-        .file {
-            font-size: 14px;
-            margin-top: 12px;
-        }
-
-        #sequence-input, #args {
-            border: none;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 13px;
-            margin: 8px 0;
-            padding: 6px;
-            width: 100%;
-        }
-
-        #sequence-input {
-            flex-grow: 1;
-            resize: none;
-        }
-    </style>
 </head>
 
 <body>
@@ -128,6 +15,8 @@
             Please select an options, model, and input file below then press run.
             <br>
         </div>
+
+        <img class="show-graphics animated hidden" onclick="showGraphics()" src="show_graphics_icon.svg">
 
         <div class="button-container">
             <div class="button green" onclick="runPhobius()">Run</div>
@@ -163,6 +52,14 @@
         <div class="file">
             Arguments:
             <input id="args" type="text">
+        </div>
+    </div>
+
+    <div class="graphics-container animated hidden">
+        <div class="graphics animated">
+            <span class="close-modal" onclick="hideGraphics()">&#10005;</span>
+            <h2>Title here</h2>
+            <img src="placeholder.png" width="100%">
         </div>
     </div>
 
