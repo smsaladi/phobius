@@ -181,14 +181,21 @@ function getExtraArgs() {
 //
 async function runPhobius() {
     files = await getFiles();
-    extra_args = getExtraArgs();
 
-    const module_parameters = initModuleParams(files, extra_args)
-    if(module_parameters) {
-        clearConsole();
-        logConsole("Loading...", false);
-        Module = Phobius(module_parameters);
-    } else {
-        logConsole("You must provide an input sequence!", true);
+    let args = ["-f"];
+    let i = 0;
+    for(const file of files) {
+        // Fail if we are missing a file
+        if(!file && !default_args[i]) {
+            return false;
+        }
+
+        args.push(file ? file.name : default_args[i]);
+        i++;
     }
+
+    clearConsole();
+    logConsole("./decode " + args.join(" "), false);
+
+    ModuleWrapper.instantiate(Phobius, args, files, (text) => logConsole(text, false), (text) => logConsole(text, true));
 }
