@@ -37,7 +37,7 @@ function printText(text) {
  *  @param text the error text to print to the console
  */
 function printError(text) {
-    console.log(text);
+    console.error(text);
     console_element.innerHTML += "<span class=error-text>" + formatText(text) + "</span>";
 
     // Scroll to the end of the console
