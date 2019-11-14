@@ -1,56 +1,77 @@
 // The html element we output console messages to
-const output = document.getElementById('console');
-const graphics = document.querySelector(".graphics");
-const graphics_container = document.querySelector(".graphics-container");
-const default_args = ["preload/phobius.options", "preload/phobius.model", null]
+const console_element = document.getElementById('console');
+// The default options and model files to fall back to
+const default_files = ["preload/phobius.options", "preload/phobius.model"]
+// The element ids of the file selectors containing the options and model files
+const file_elements = ["options", "model"]
 
+/*******************************************************************************
+ *                                                                             *
+ *                              CONSOLE FUNCTIONS                              *
+ *                                                                             *
+ ******************************************************************************/
+
+/**
+ *  This function clears out all text in the console
+ */
 function clearConsole() {
-    output.innerHTML = "";
+    console_element.innerHTML = "";
 }
 
-function logConsole(message, is_error) {
-    // Output to JS console
-    if (is_error) {
-        console.error(message);
-    } else {
-        console.log(message);
-    }
-
-    // Output to console html element
-    output.innerHTML = output.innerHTML + formatText(message, is_error);
+/**
+ *  This function prints text to the console
+ *
+ *  @param text the text to print to the console
+ */
+function printText(text) {
+    console.log(text);
+    console_element.innerHTML += formatText(text);
 
     // Scroll to the end of the console
-    output.scrollTop = output.scrollHeight;
+    console_element.scrollTop = console_element.scrollHeight;
 }
 
-//
-//  Formats text to print correctly in HTML
-//
-function formatText(text, is_error) {
+/**
+ *  This function prints an error message to the console
+ *
+ *  @param text the error text to print to the console
+ */
+function printError(text) {
+    console.log(text);
+    console_element.innerHTML += "<span class=error-text>" + formatText(text) + "</span>";
+
+    // Scroll to the end of the console
+    console_element.scrollTop = console_element.scrollHeight;
+}
+
+/**
+ *  This function formats text to print correctly in HTML
+ */
+function formatText(text) {
     text = text.replace(/&/g, "&amp;");
     text = text.replace(/</g, "&lt;");
     text = text.replace(/>/g, "&gt;");
     text = text.replace('\n', '<br>', 'g');
     text = text.replace(/ /g, '&nbsp;');
 
-    if(is_error) {
-        return "<span class=error-text>" + text + "</span><br>"
-    } else {
-        return text + "<br>";
-    }
+    return text + "<br>";
 }
 
+/**
+ *  This function downloads the text currently in the console
+ */
 function downloadConsole() {
-    download("console.txt", output.innerText);
-}
+    const filename = "console.txt";
+    const data = console_element.innerText;
 
-function download(filename, data) {
-    var blob = new Blob([data], {type: 'text/csv'});
-    if(window.navigator.msSaveOrOpenBlob) {
+    // Write the console data to a new blob
+    const blob = new Blob([data], {type: 'text/csv'});
+
+    // Download the blob
+    if (window.navigator.msSaveOrOpenBlob) {
         window.navigator.msSaveBlob(blob, filename);
-    }
-    else{
-        var elem = window.document.createElement('a');
+    } else {
+        const elem = window.document.createElement('a');
         elem.href = window.URL.createObjectURL(blob);
         elem.download = filename;
         document.body.appendChild(elem);
@@ -59,6 +80,16 @@ function download(filename, data) {
     }
 }
 
+
+/*******************************************************************************
+ *                                                                             *
+ *                           FILE SELECTOR FUNCTIONS                           *
+ *                                                                             *
+ ******************************************************************************/
+
+/**
+ *  This function updates the label of a file selector
+ */
 function updateFileLabel(element, default_text) {
     const file = element.files[0]
     const label = document.getElementById(element.id + "-label");
@@ -73,9 +104,9 @@ function updateFileLabel(element, default_text) {
     }
 }
 
-//
-//  Reads file data from the input_element and base 64 encodes it
-//
+/**
+ *  This function reads file data from the input_element and base 64 encodes it
+ */
 async function getFileData(input_element) {
     return new Promise(function(resolve, reject) {
         // Get the file from the html element
@@ -86,42 +117,95 @@ async function getFileData(input_element) {
 
         // Start reading from the file
         const reader = new FileReader();
-        reader.readAsDataURL(file);
+        reader.readAsText(file);
 
         // Wait until we finish reading the file
         reader.addEventListener("load", function() {
             // Trim the padding on the data
-            base64_data = reader.result.substring(reader.result.indexOf(",") + 1);
-            resolve({name: file.name, data: base64_data});
+            filedata = reader.result.substring(reader.result.indexOf(",") + 1);
+            resolve({name: file.name, data: filedata});
         }, false);
     });
 }
 
-//
-//  Synchronously reads file data from all input elements on the page
-//
-async function getFiles() {
-    inputs = document.querySelectorAll("input[type=file]");
-    files = [];
-    for (input of inputs) {
-        files.push(await getFileData(input));
+/**
+ *  This function gets the options and model files the user specified
+ *
+ *  @param files an array that the files should be added to
+ *  @param args an array containing the command line arguments passed to phobius
+ */
+async function getFiles(files, args) {
+    args.push("-f");
+    for(let i = 0; i < file_elements.length; i++) {
+        const file_element = document.getElementById(file_elements[i]);
+        const file = await getFileData(file_element);
+        if(file) {
+            args.push(file.name);
+            files.push(file);
+        } else {
+            args.push(default_files[i]);
+        }
     }
-
-    if(!files[files.length - 1]) {
-        const sequence = document.getElementById("sequence-input").value;
-        files[files.length - 1] = {name: "seq.txt", data: btoa(sequence)};
-    }
-
-    return files;
 }
 
-function getExtraArgs() {
+/**
+ *  This function gets the sequence data specified by the user from the file
+ *  selector or the textarea
+ *
+ *  @param files an array that the files should be added to
+ *  @param args an array containing the command line arguments passed to phobius
+ */
+async function getSequenceData(files, args) {
+    const sequence_element = document.getElementById("sequence");
+    sequence_file = await getFileData(sequence_element);
+    if(!sequence_file) {
+        const sequence_data = document.getElementById("sequence-input").value;
+        sequence_file = {name: "seq.txt", data: sequence_data};
+    }
+    args.push(sequence_file.name);
+    files.push(sequence_file);
+}
+
+/**
+ *  This function gets extra program arguments from the args field
+ */
+function getUserArgs() {
     const raw = document.getElementById("args").value;
     const formatted = raw.replace(/\s\s+/g, ' ').trim();
     return formatted.length > 0 ? formatted.split(" ") : [];
 }
 
+/*******************************************************************************
+ *                                                                             *
+ *                             GRAPHICS FUNCTIONS                              *
+ *                                                                             *
+ ******************************************************************************/
+
+/**
+ *  This function sets up the graphics to display given the output from phobius
+ *
+ *  @param output the output from phobius
+ */
+function createGraphics(output) {
+    const graphics_element = document.getElementById("graphics");
+    console.log(output)
+
+    // TODO: replace placeholder image with actual graphics
+    graphics_element.innerHTML = "<h2>Title here</h2>";
+    graphics_element.innerHTML += "<img src='placeholder.png' width='100%'>";
+
+    // TODO: return true if the graphics were created successfully, false if
+    // something was wrong with the input
+    return true;
+}
+
+/**
+ *  This function shows the graphics modal
+ */
 function showGraphics() {
+    const graphics = document.querySelector(".graphics");
+    const graphics_container = document.querySelector(".graphics-container");
+
     document.querySelector(".show-graphics").classList.remove("hidden");
     graphics_container.classList.remove("hidden");
 
@@ -131,7 +215,13 @@ function showGraphics() {
     graphics_container.classList.add("fadeIn");
 }
 
+/**
+ *  This function hides the graphics modal
+ */
 function hideGraphics() {
+    const graphics = document.querySelector(".graphics");
+    const graphics_container = document.querySelector(".graphics-container");
+
     graphics.classList.add("fadeOutUp");
     graphics.classList.remove("fadeInDown");
     graphics_container.classList.add("fadeOut");
@@ -140,28 +230,28 @@ function hideGraphics() {
     setTimeout(()=>graphics_container.classList.add("hidden"), 250);
 }
 
-//
-//  Sets up and runs the Phobius module
-//
+/**
+ *  This function sets up and runs the phobius module
+ */
 async function runPhobius() {
-    files = await getFiles();
+    let files = [], args = [];
 
-    let args = ["-f"];
-    let i = 0;
-    for(const file of files) {
-        // Fail if we are missing a file
-        if(!file && !default_args[i]) {
-            return false;
-        }
+    // Get options and model files
+    await getFiles(files, args);
 
-        args.push(file ? file.name : default_args[i]);
-        i++;
-    }
+    // Get sequence file
+    await getSequenceData(files, args);
 
+    // Add user specified arguments
+    args = args.concat(getUserArgs());
+
+    // Log the command we are using
     clearConsole();
-    logConsole("./decode " + args.join(" "), false);
+    printText("./decode " + args.join(" "));
 
-    await ModuleWrapper.instantiate(Phobius, args, files, (text) => logConsole(text, false), (text) => logConsole(text, true));
+    await ModuleWrapper.instantiate(Phobius, args, files, printText, printError);
 
-    showGraphics();
+    if(createGraphics(console_element.innerText)) {
+        showGraphics();
+    }
 }

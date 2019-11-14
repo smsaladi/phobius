@@ -14,7 +14,7 @@ var InstantiateModule = (function(Module, args, files) {
 
                 try {
                     mounted_files[file.name] =
-                        Instance["FS_createDataFile"](".", file.name, atob(file.data), true, true);
+                        Instance["FS_createDataFile"](".", file.name, file.data, true, true);
                     console.log("Loaded file " + file.name + " successfully")
                     console.log(mounted_files[file.name])
                 } catch (e) {
