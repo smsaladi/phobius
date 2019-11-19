@@ -12,7 +12,7 @@ all:
 
 	$(CC) decodeanhmm.bc -o $(BUILD_DIR)/project.js \
 		-s FORCE_FILESYSTEM=1 --preload-file preload \
-		-s MODULARIZE=1 -s 'EXPORT_NAME="Phobius"'
+		-s MODULARIZE=1 -s 'EXPORT_NAME="Phobius"' -s EXIT_RUNTIME=1
 
 clean:
 	rm -r preload *.bc $(BUILD_DIR)/project.*
