@@ -11,7 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+        # Use HTTPS instead of SSH (necessary for private repos)
+      - name: Fix up git URLs
+        run: echo -e '[url "https://github.com/"]\n  insteadOf = "git@github.com:"' >> ~/.gitconfig
       - uses: actions/checkout@v1
+        with:
+          submodules: true
+          token: ${{ secrets.GH_PAT }}
       - name: Clone emscipten
         run: git clone https://github.com/emscripten-core/emsdk.git
       - name: Set up emscripten
