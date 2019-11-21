@@ -30,6 +30,10 @@ body {
     color: #e74c3c
 }
 
+.console-command {
+    color: rgba(255,255,255,0.35);
+}
+
 .button-container {
     align-items: center;
     background-color: #bdc3c7;
@@ -126,7 +130,7 @@ body {
 }
 
 .graphics {
-    margin-top: 32px;
+    margin-top: 64px;
     /* margin: auto; */
     text-align: center;
     padding: 20px;

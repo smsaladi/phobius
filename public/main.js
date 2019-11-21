@@ -5,6 +5,10 @@ const default_files = ["preload/phobius.options", "preload/phobius.model"]
 // The element ids of the file selectors containing the options and model files
 const file_elements = ["options", "model"]
 
+const default_sequence = `>tr|M1VDK2|M1VDK2_CYAM1
+SVMLPPVAFLPQPVRPGTRSKRKPEARVKRQKRALRRRVPCQSSLTPSRSQAPKALFPGDVEAWLRAAAKRRQRLQSPDSGVLLVLAALVGAGTGLGVTLFKTAIRGVSDFGYGDTVAGALLPFVGSLNLIAVPTMGGACVSFLKLRFGALDGGIEAMLRSMEKNERFQSAGAIVKAIAAVFTLGSGCSLGPEGPSVEIGASVARLIPQWASERLQWRLSSERLRQLFACGCAAGVAAGFNAPFAGVLFANEIAQRAGGNHTESGTGASTTPALLVASALSSLVARLGLGERPAFSIPNYDLRNPLLELPLYLGLGFLAGLASLGFRKALLLGQNLYQCTGLRRIPVAWRPLCGGLLNGMVGFVFPQILFFGYDMLDALLADTNFSIPLLAGLLFLKPLMTAASLGSGLVGGTFAPALFVGANLGALYCKSIECAGNALLAIVFKTLGATTATALSGSIPIAGPPAYAMVGMAAVLAGMFRAPLTGCLLLFEMTRDYRIILPLMAGVGVSTWIADDTRQQVRASPSAYATKRNEGPSPLYLGLRPDAEFRSVAACLSVRDGLSPLKPVFLDAQCSVSVALERFRPLEHGCILVTTTMPVEQIQGLVTVRDLLRAKSEFGALQGITLGEICSTDFESISLEEPLVRALEILESNSAPLLPVVVGTTTEERGRSEQPNGAYESPSRMKISPSMVCGFVDLTSIERAVQFSRLQMAAREPDGPS`
+document.getElementById("sequence-input").value = default_sequence;
+
 /*******************************************************************************
  *                                                                             *
  *                              CONSOLE FUNCTIONS                              *
@@ -39,6 +43,13 @@ function printText(text) {
 function printError(text) {
     console.error(text);
     console_element.innerHTML += "<span class=error-text>" + formatText(text) + "</span>";
+
+    // Scroll to the end of the console
+    console_element.scrollTop = console_element.scrollHeight;
+}
+
+function printCommand(text) {
+    console_element.innerHTML += "<span class=console-command>" + formatText(text) + "</span>";
 
     // Scroll to the end of the console
     console_element.scrollTop = console_element.scrollHeight;
@@ -247,7 +258,7 @@ async function runPhobius() {
 
     // Log the command we are using
     clearConsole();
-    printText("./decode " + args.join(" "));
+    printCommand("$ ./decodeanhmm " + args.join(" "));
 
     await ModuleWrapper.instantiate(Phobius, args, files, printText, printError);
 
