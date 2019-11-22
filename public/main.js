@@ -199,7 +199,6 @@ function getUserArgs() {
  */
 function createGraphics(output) {
     const graphics_element = document.getElementById("graphics");
-    console.log(output)
 
     // TODO: replace placeholder image with actual graphics
     graphics_element.innerHTML = "<h2>Title here</h2>";

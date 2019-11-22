@@ -15,8 +15,6 @@ var InstantiateModule = (function(Module, args, files) {
                 try {
                     mounted_files[file.name] =
                         Instance["FS_createDataFile"](".", file.name, file.data, true, true);
-                    console.log("Loaded file " + file.name + " successfully")
-                    console.log(mounted_files[file.name])
                 } catch (e) {
                     sendConsoleMessage("Could not load file " + file.name, true);
                     console.error(e);
@@ -24,8 +22,6 @@ var InstantiateModule = (function(Module, args, files) {
             }
         }],
         postRun: [function() {
-            console.log("Finished running")
-            console.log(Instance)
             postMessage({
                 type: "complete"
             });
